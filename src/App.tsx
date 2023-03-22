@@ -7,7 +7,7 @@ function App() {
     const [layout, setLayout] = useState(() => getNewLayout())
     const regenerate = () => setLayout(getNewLayout())
     return <AppContainer>
-        <Header><h1>Catan Board Generator</h1></Header>
+        <Header><h1>Settlers Board Generator</h1></Header>
         <Main>
             {
                 layout ?
