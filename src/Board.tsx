@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import React, {useEffect, useState} from "react";
-import {AxialCoordinates, getNewLayout, Hex, TILE_TYPES} from "./Catan";
+import {AxialCoordinates, Hex, TILE_TYPES} from "./Catan";
 
 const CANVAS_SIZE = 2000
-export const Board = ({layout} : {layout: Hex[]}) => {
+export const Board = ({layout, fontSizeModifier} : {layout: Hex[], fontSizeModifier: number}) => {
     const [ctx, setCtx] = useState<null | CanvasRenderingContext2D>()
 
     useEffect(() => {
@@ -12,12 +12,12 @@ export const Board = ({layout} : {layout: Hex[]}) => {
             const {offsetWidth, offsetHeight} = canvas.parentElement || {offsetWidth: 0, offsetHeight: 0}
             const max = Math.max(offsetHeight, offsetWidth);
             canvas.width = canvas.height = max
-            ctx.font = `bold ${canvas.width / 40}px Arial`
+            ctx.font = `bold ${canvas.width / (40 - fontSizeModifier)}px Arial`
             ctx.textBaseline = "middle"
             ctx.textAlign = 'center'
-            renderCatanBoard(ctx, layout)
+            renderCatanBoard(ctx, layout, fontSizeModifier)
         }
-    }, [ctx, layout])
+    }, [ctx, layout, fontSizeModifier])
 
     return <AspectContainer>
         <Canvas ref={e => e && setCtx(e.getContext('2d'))} height={CANVAS_SIZE} width={CANVAS_SIZE}/>
@@ -25,7 +25,7 @@ export const Board = ({layout} : {layout: Hex[]}) => {
 }
 
 
-const renderCatanBoard = (ctx: CanvasRenderingContext2D, layout: Hex[]) => {
+const renderCatanBoard = (ctx: CanvasRenderingContext2D, layout: Hex[], fontSizeModifier: number) => {
     function renderHexagonalLayout(layout: Hex[], ctx: CanvasRenderingContext2D, margin: number = 2): void {
         // Calculate the dimensions of the layout
         let minQ = 0, maxQ = 0, minR = 0, maxR = 0;
@@ -54,7 +54,6 @@ const renderCatanBoard = (ctx: CanvasRenderingContext2D, layout: Hex[]) => {
         ctx.strokeStyle = '#000'; // Set the stroke color to black
 
         layout.forEach((hex: Hex) => {
-            const {q, r} = hex
             const x = effectiveTileSize * Math.sqrt(3) * (hex.q - minQ + (hex.r - minR) / 2) + layoutX - effectiveTileSize * Math.sqrt(3) / 2;
             const y = effectiveTileSize * 3 / 2 * (hex.r - minR) + layoutY + effectiveTileSize;
 
@@ -80,14 +79,14 @@ const renderCatanBoard = (ctx: CanvasRenderingContext2D, layout: Hex[]) => {
             // const label = `${q}, ${r} ${aboveRightNeighbour.q}, ${aboveRightNeighbour.r}`
             if (hex.num) {
                 ctx.beginPath()
-                ctx.arc(x, y, effectiveTileSize / 5, 0, 2 * Math.PI, false)
+                ctx.arc(x, y, effectiveTileSize / (5 - (fontSizeModifier / 9)), 0, 2 * Math.PI, false)
                 ctx.fillStyle = '#fff'
                 ctx.fill();
                 ctx.stroke()
                 ctx.closePath()
                 ctx.fillStyle = (hex.num === 8 || hex.num === 6) ? '#ff3333' : '#000'
                 const label = String(hex.num)
-                ctx.fillText(label, x, y)
+                ctx.fillText(label, x, y + effectiveTileSize / 40)
             } else {
                 ctx.beginPath()
                 ctx.arc(x, y, effectiveTileSize / 5, 0, 2 * Math.PI, false)
