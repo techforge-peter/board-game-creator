@@ -102,6 +102,16 @@ const testHexSixesAndEights = (a: Hex, b: Hex) => {
     return sixesAndEights.includes(a.num || -1) && sixesAndEights.includes(b.num || -1)
 }
 
+const testSameNumberNeighbour = (a: Hex, b: Hex) => {
+    if (!a || !b) {
+        return false
+    }
+
+    return a.num === b.num
+}
+
+
+
 const testLayout = (layout: Hex[]) => {
     const hexMap = layout.reduce((acc: HexMap, hex: Hex) => {
         const qMap = acc[hex.q] || (acc[hex.q] = {})
@@ -115,7 +125,10 @@ const testLayout = (layout: Hex[]) => {
         if (
             testHexSixesAndEights(hex, getHex(getAboveRightNeighbour(hex.q, hex.r))) ||
             testHexSixesAndEights(hex, getHex(getRightNeighbour(hex.q, hex.r))) ||
-            testHexSixesAndEights(hex, getHex(getBelowRightNeighbour(hex.q, hex.r)))
+            testHexSixesAndEights(hex, getHex(getBelowRightNeighbour(hex.q, hex.r))) ||
+            testSameNumberNeighbour(hex, getHex(getAboveRightNeighbour(hex.q, hex.r))) ||
+            testSameNumberNeighbour(hex, getHex(getRightNeighbour(hex.q, hex.r))) ||
+            testSameNumberNeighbour(hex, getHex(getBelowRightNeighbour(hex.q, hex.r)))
         ) {
             return false
         }
